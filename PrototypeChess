@@ -1,0 +1,68 @@
+#include <iostream>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+class figure{
+public:
+    virtual void Move() = 0;
+    virtual void CheckIfCanMoveTo() = 0;
+protected:
+    bool IsTaken = false;
+    int Position[2] = {0,0};
+    string name;
+};
+
+class pawn : public figure{
+public:
+    pawn(string Gname){name = Gname;}
+    void Move();
+    void CheckIfCanMoveTo();
+};
+
+class rook : public figure{
+    
+};
+
+class knight : public figure{
+    
+};
+
+class bishop : public figure{
+    
+};
+
+class queen : public figure{
+    
+};
+
+class king : public figure{
+    
+};
+
+class empty : public figure{
+    
+};
+
+class board{
+public:
+    void PrintBoard();
+    void SetBoard();
+protected:
+    figure*** Placements;
+};
+void board::SetBoard(){
+    Placements = new figure**[8];
+    for(int i = 0; i < 8; i++){
+        Placements[i] = new figure*[8];
+    }
+}
+
+
+int main() {
+    board som;
+    
+
+    return 0;
+}
