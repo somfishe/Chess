@@ -1,68 +1,210 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cstdlib>
 
 using namespace std;
 
-class figure{
+class figure {
 public:
     virtual void Move() = 0;
     virtual void CheckIfCanMoveTo() = 0;
+    virtual void PrintThis() = 0;
 protected:
     bool IsTaken = false;
-    int Position[2] = {0,0};
-    string name;
+    bool IsWhite = true;
+    int Position[2] = { 0,0 };
+    string type;
+    int MoveCount = 0;
+    board* parent = nullptr;
 };
 
-class pawn : public figure{
+class pawn : public figure {
 public:
-    pawn(string Gname){name = Gname;}
+    pawn(int y, int x, bool iswhite) { Position[0] = y; Position[1] = x; IsWhite = iswhite; type = "pawn"; }
     void Move();
     void CheckIfCanMoveTo();
-};
+    void PrintThis();
+private:
 
-class rook : public figure{
-    
 };
+void pawn::Move() {
 
-class knight : public figure{
-    
-};
+}
+void pawn::CheckIfCanMoveTo() {
 
-class bishop : public figure{
-    
-};
+}
+void pawn::PrintThis() {
+    if (IsWhite) cout << "p";//♙
+    else cout << "P";
+}
 
-class queen : public figure{
-    
-};
-
-class king : public figure{
-    
-};
-
-class empty : public figure{
-    
-};
-
-class board{
+class rook : public figure {
 public:
+    rook(int y, int x, bool iswhite) { Position[0] = y; Position[1] = x; IsWhite = iswhite; type = "rook"; }
+    void Move();
+    void CheckIfCanMoveTo();
+    void PrintThis();
+};
+void rook::Move() {
+
+}
+void rook::CheckIfCanMoveTo() {
+
+}
+void rook::PrintThis() {
+    if (IsWhite) cout << "r";//
+    else cout << "R";
+}
+
+class knight : public figure {
+public:
+    knight(int y, int x, bool iswhite) { Position[0] = y; Position[1] = x; IsWhite = iswhite; type = "knight"; }
+    void Move();
+    void CheckIfCanMoveTo();
+    void PrintThis();
+};
+void knight::Move() {
+
+}
+void knight::CheckIfCanMoveTo() {
+
+}
+void knight::PrintThis() {
+    if (IsWhite) cout << "n";//
+    else cout << "N";
+}
+
+class bishop : public figure {
+public:
+    bishop(int y, int x, bool iswhite) { Position[0] = y; Position[1] = x; IsWhite = iswhite; type = "bishop"; }
+    void Move();
+    void CheckIfCanMoveTo();
+    void PrintThis();
+};
+void bishop::Move() {
+
+}
+void bishop::CheckIfCanMoveTo() {
+
+}
+void bishop::PrintThis() {
+    if (IsWhite) cout << "b";//
+    else cout << "B";
+}
+
+class queen : public figure {
+public:
+    queen(int y, int x, bool iswhite) { Position[0] = y; Position[1] = x; IsWhite = iswhite; type = "queen"; }
+    void Move();
+    void CheckIfCanMoveTo();
+    void PrintThis();
+};
+void queen::Move() {
+
+}
+void queen::CheckIfCanMoveTo() {
+
+}
+void queen::PrintThis() {
+    if (IsWhite) cout << "q";//
+    else cout << "Q";
+}
+
+class king : public figure {
+public:
+    king(int y, int x, bool iswhite) { Position[0] = y; Position[1] = x; IsWhite = iswhite; type = "king"; }
+    void Move();
+    void CheckIfCanMoveTo();
+    void PrintThis();
+};
+void king::Move() {
+
+}
+void king::CheckIfCanMoveTo() {
+
+}
+void king::PrintThis() {
+    if (IsWhite) cout << "k";//
+    else cout << "K";
+}
+
+class emptyspace : public figure {
+public:
+    emptyspace(int y, int x, bool iswhite) { Position[0] = y; Position[1] = x; IsWhite = iswhite; type = "empty"; }
+    void Move();
+    void CheckIfCanMoveTo();
+    void PrintThis();
+};
+void emptyspace::Move() {
+
+}
+void emptyspace::CheckIfCanMoveTo() {
+
+}
+void emptyspace::PrintThis() {
+    if (IsWhite) cout << ".";//
+    else cout << ".";
+}
+
+class board {
+public:
+    void play();
     void PrintBoard();
     void SetBoard();
 protected:
     figure*** Placements;
 };
-void board::SetBoard(){
-    Placements = new figure**[8];
-    for(int i = 0; i < 8; i++){
-        Placements[i] = new figure*[8];
+void board::SetBoard() {
+    Placements = new figure * *[8];
+    for (int i = 0; i < 8; i++) {
+        Placements[i] = new figure * [8];
+    }
+    //
+    Placements[0][0] = new rook(0, 0, true);
+    Placements[0][1] = new knight(0, 1, true);
+    Placements[0][2] = new bishop(0, 2, true);
+    Placements[0][3] = new queen(0, 3, true);
+    Placements[0][4] = new king(0, 4, true);
+    Placements[0][5] = new bishop(0, 5, true);
+    Placements[0][6] = new knight(0, 6, true);
+    Placements[0][7] = new rook(0, 7, true);
+    for (int i = 0; i < 8; i++) {
+        Placements[1][i] = new pawn(1, i, true);
+    }
+    //
+    Placements[7][0] = new rook(7, 0, false);
+    Placements[7][1] = new knight(7, 1, false);
+    Placements[7][2] = new bishop(7, 2, false);
+    Placements[7][3] = new queen(7, 3, false);
+    Placements[7][4] = new king(7, 4, false);
+    Placements[7][5] = new bishop(7, 5, false);
+    Placements[7][6] = new knight(7, 6, false);
+    Placements[7][7] = new rook(7, 7, false);
+    for (int i = 0; i < 8; i++) {
+        Placements[6][i] = new pawn(6, i, false);
+    }
+    //
+    for (int i = 0; i < 8; i++) {
+        for (int j = 2; j < 6; j++) {
+            Placements[j][i] = new emptyspace(j, i, true);
+        }
+    }
+}
+void board::PrintBoard() {
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            Placements[7-i][j]->PrintThis();
+        }
+        cout << endl;
     }
 }
 
 
 int main() {
     board som;
-    
+    som.SetBoard();
+    som.PrintBoard();
 
     return 0;
 }
