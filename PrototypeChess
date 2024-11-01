@@ -1,150 +1,238 @@
-
 #include <iostream>
 #include <string>
 #include <vector>
 #include <cstdlib>
 
 using namespace std;
-//
-//
-void PrintFigure(bool IsWhite, string type){
-    if(IsWhite){
-        if(type == "pawn") cout << "p";
-        else if(type == "rook") cout << "r";
-        else if(type == "knight") cout << "n";
-        else if(type == "bishop") cout << "b";
-        else if(type == "queen") cout << "q";
-        else if(type == "king") cout << "k";
-        else cout << ".";
-    }
-    else{
-        if(type == "pawn") cout << "P";
-        else if(type == "rook") cout << "R";
-        else if(type == "knight") cout << "N";
-        else if(type == "bishop") cout << "B";
-        else if(type == "queen") cout << "Q";
-        else if(type == "king") cout << "K";
-        else cout << ".";
-    }
+
+void ConvertToNumber(char* Input) {
+    if (*Input == 'a') *Input = '1';
+    if (*Input == 'b') *Input = '2';
+    if (*Input == 'c') *Input = '3';
+    if (*Input == 'd') *Input = '4';
+    if (*Input == 'e') *Input = '5';
+    if (*Input == 'f') *Input = '6';
+    if (*Input == 'g') *Input = '7';
+    if (*Input == 'h') *Input = '8';
 }
-//
-//
-class figure;
+char ConvertToChar(int Input) {
+    if (Input == 1) return 'a';
+    if (Input == 2) return 'b';
+    if (Input == 3) return 'c';
+    if (Input == 4) return 'd';
+    if (Input == 5) return 'e';
+    if (Input == 6) return 'f';
+    if (Input == 7) return 'g';
+    if (Input == 8) return 'h';
+}
+bool CheckIfValidNumber(string Input) {
+    if (Input.length() > 2) {
+        cout << "Invalid input: too long!" << endl;
+        return false;
+    }
+    if (Input[0] != 'a' && Input[0] != 'b' && Input[0] != 'c' && Input[0] != 'd' && Input[0] != 'e' && Input[0] != 'f' && Input[0] != 'g' && Input[0] != 'h') {
+        cout << "Invalid input: invalid character(first)!" << endl;
+        return false;
+    }
+    if (Input[1] != '1' && Input[1] != '2' && Input[1] != '3' && Input[1] != '4' && Input[1] != '5' && Input[1] != '6' && Input[1] != '7' && Input[1] != '8') {
+        cout << "Invalid input: invalid character(second)!" << endl;
+        return false;
+    }
+    return true;
+}
+string TakeInputMove(string Message) {
+    string Input;
+    do {
+        cout << Message;
+        cin >> Input;
+    } while (!CheckIfValidNumber(Input));
+    ConvertToNumber(&Input[0]);
+    return Input;
+}
 
 class board;
 
 class figure {
 public:
-    figure(int x, int y, bool IsWhite, string type){
+    figure(int y, int x, bool IsWhite, string type, board* Parent, int Id) {
         Position[0] = y;
         Position[1] = x;
         this->IsWhite = IsWhite;
-        this->type = type;
-    } 
+        this->Type = type;
+        this->Parent = Parent;
+        this->Id = Id;
+    }
 
     void Move(int x, int y);
     void CheckIfCanMoveTo();
-    void PrintThis(){PrintFigure(IsWhite,type);}
-    
-    string GetType(){return type;}
-    bool GetIsWhite(){return IsWhite;}
-    bool GetPositionX(){return Position[1];}
-    bool GetPositionY(){return Position[0];}    
-    bool GetHaveMoved(){return HaveMoved;}
-    
-    void SetParent(board* parent){this->parent = parent;}
-    void SetType(string type){this->type = type;}
-    void SetPositionX(int x){Position[1] = x;}
-    void SetPositionY(int y){Position[0] = y;}
-    void SetPosition(int x, int y){Position[0] = y; Position[1] = x;}
-    void SetHaveMoved(bool HaveMoved){this->HaveMoved = HaveMoved;}
-    
+    void PrintThis();
+    void PrintPropeties();
+
+    string GetType() { return Type; }
+    bool GetIsWhite() { return IsWhite; }
+    bool GetPositionX() { return Position[1]; }
+    bool GetPositionY() { return Position[0]; }
+    bool GetHaveMoved() { return HaveMoved; }
+    int GetId() { return Id; }
+    string GetPosition();
+    string GetDescription();
+
+    void SetParent(board* parent) { this->Parent = parent; }
+    void SetType(string Type) { this->Type = Type; }
+    void SetPositionX(int x) { Position[1] = x; }
+    void SetPositionY(int y) { Position[0] = y; }
+    void SetPosition(int y, int x) { Position[0] = y; Position[1] = x; }
+    void SetHaveMoved(bool HaveMoved) { this->HaveMoved = HaveMoved; }
+    void SetId(int Id) { this->Id = Id; }
+
 protected:
     bool IsWhite = true;
     int Position[2] = { 0,0 };
-    string type;
+    string Type;
     bool HaveMoved = false;
-    board* parent = nullptr;
+    board* Parent = nullptr;
+    int Id;
 };
+void figure::PrintPropeties() {
+    cout << "Figure type: " << (IsWhite ? "White " : "Black ") << Type << "; Coordinates: " << ConvertToChar(Position[1] + 1) << Position[1] + 1 << " Id: " << Id << endl;
+}
+void figure::PrintThis() {
+    if (IsWhite) {
+        if (Type == "pawn") cout << "p";
+        else if (Type == "rook") cout << "r";
+        else if (Type == "knight") cout << "n";
+        else if (Type == "bishop") cout << "b";
+        else if (Type == "queen") cout << "q";
+        else if (Type == "king") cout << "k";
+        else cout << ".";
+    }
+    else {
+        if (Type == "pawn") cout << "P";
+        else if (Type == "rook") cout << "R";
+        else if (Type == "knight") cout << "N";
+        else if (Type == "bishop") cout << "B";
+        else if (Type == "queen") cout << "Q";
+        else if (Type == "king") cout << "K";
+        else cout << ".";
+    }
+}
+string figure::GetPosition() {
+    string position = "00";
+    position[0] = ConvertToChar(Position[1] + 1);
+    position[1] = (Position[0] + 1) + '0';
+    return position;
+}
+string figure::GetDescription() {
+    string position = "00";
+    position[0] = ConvertToChar(Position[1] + 1);
+    position[1] = (Position[0] + 1) + '0';
+    return (IsWhite ? "White " : "Black ") + Type + " on " + position;
+}
 
 class board {
 public:
-    void play();
+    void Play();
     void PrintBoard();
     void SetBoard();
+    void PrintAllFiguresProperties();
+
     figure*** Placements;
 protected:
-    
+
 };
 void board::SetBoard() {
+    int Id = 1;
     Placements = new figure * *[8];
     for (int i = 0; i < 8; i++) {
         Placements[i] = new figure * [8];
     }
     //
-    Placements[0][0] = new figure(0, 0, true, "rook");
-    Placements[0][1] = new figure(0, 1, true, "rook");
-    Placements[0][2] = new figure(0, 2, true, "rook");
-    Placements[0][3] = new figure(0, 3, true, "rook");
-    Placements[0][4] = new figure(0, 4, true, "rook");
-    Placements[0][5] = new figure(0, 5, true, "rook");
-    Placements[0][6] = new figure(0, 6, true, "rook");
-    Placements[0][7] = new figure(0, 7, true, "rook");
+    Placements[0][0] = new figure(0, 0, true, "rook", this, Id++);
+    Placements[0][1] = new figure(0, 1, true, "knight", this, Id++);
+    Placements[0][2] = new figure(0, 2, true, "bishop", this, Id++);
+    Placements[0][3] = new figure(0, 3, true, "queen", this, Id++);
+    Placements[0][4] = new figure(0, 4, true, "king", this, Id++);
+    Placements[0][5] = new figure(0, 5, true, "bishop", this, Id++);
+    Placements[0][6] = new figure(0, 6, true, "knight", this, Id++);
+    Placements[0][7] = new figure(0, 7, true, "rook", this, Id++);
     for (int i = 0; i < 8; i++) {
-        Placements[1][i] = new figure(1, i, true, "rook");
+        Placements[1][i] = new figure(1, i, true, "pawn", this, Id++);
     }
     //
-    Placements[7][0] = new figure(7, 0, true, "rook");
-    Placements[7][1] = new figure(7, 1, true, "rook");
-    Placements[7][2] = new figure(7, 2, true, "rook");
-    Placements[7][3] = new figure(7, 3, true, "rook");
-    Placements[7][4] = new figure(7, 4, true, "rook");
-    Placements[7][5] = new figure(7, 5, true, "rook");
-    Placements[7][6] = new figure(7, 6, true, "rook");
-    Placements[7][7] = new figure(7, 7, true, "rook");
-    for (int i = 0; i < 8; i++) {
-        Placements[6][i] = new figure(6, i, true, "rook");
-    //
-    for (int i = 0; i < 8; i++) {
-        for (int j = 2; j < 6; j++) {
-            Placements[j][i] = new figure(j, i, true, "rook");
+    for (int i = 2; i < 6; i++) {
+        for (int j = 0; j < 8; j++) {
+            Placements[i][j] = new figure(i, j, true, "empty", this, Id++);
         }
     }
     //
     for (int i = 0; i < 8; i++) {
+        Placements[6][i] = new figure(6, i, false, "pawn", this, Id++);
+    }
+    Placements[7][0] = new figure(7, 0, false, "rook", this, Id++);
+    Placements[7][1] = new figure(7, 1, false, "knight", this, Id++);
+    Placements[7][2] = new figure(7, 2, false, "bishop", this, Id++);
+    Placements[7][3] = new figure(7, 3, false, "queen", this, Id++);
+    Placements[7][4] = new figure(7, 4, false, "king", this, Id++);
+    Placements[7][5] = new figure(7, 5, false, "bishop", this, Id++);
+    Placements[7][6] = new figure(7, 6, false, "knight", this, Id++);
+    Placements[7][7] = new figure(7, 7, false, "rook", this, Id++);
+    
+}
+void board::PrintBoard(){
+    for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Placements[7 - i][j]->PrintThis();
+            }
+            cout << endl;
+        }
+    cout << endl;
+}
+void board::PrintAllFiguresProperties() {
+    for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
-            Placements[j][i]->SetParent(this);
+            Placements[i][j]->PrintPropeties();
         }
     }
 }
-void board::PrintBoard() {
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-            Placements[7-i][j]->PrintThis();
-        }
+void board::Play() {
+    int x1, x2, y1, y2;
+    string Input;
+    PrintBoard();
+    for (int i = 0; i < 10; i++) {
+        Input = TakeInputMove("Chose a piece(Example: 'e6'): ");
+        x1 = (Input[0] - '0') - 1;
+        y1 = (Input[1] - '0') - 1;
+        cout << "Chosen " << Placements[y1][x1]->GetDescription() << endl;
+        Input = TakeInputMove("Chose where to move(Example: 'e6'): ");
+        x2 = (Input[0] - '0') - 1;
+        y2 = (Input[1] - '0') - 1;
+        Placements[y1][x1]->Move(y2, x2);
         cout << endl;
+        PrintBoard();
     }
+    
 }
-void figure::Move(int y, int x){
-    figure* temp = parent->Placements[y][x];
-    if(temp->GetType() != "empty"){ temp->SetType("empty");
+
+void figure::Move(int y, int x) {
+    figure* temp = Parent->Placements[y][x];
+    if (temp->GetType() != "empty") {
+        cout << (IsWhite ? "White " : "Black ") << Type << " captures " + Parent->Placements[y][x]->GetDescription() << endl;
+        temp->SetType("empty");
     }
-    parent->Placements[y][x] = this;
-    parent->Placements[Position[0]][Position[1]] = temp;
-    SetPositionX(x);
-    SetPositionY(y);
+    else cout << (IsWhite ? "White " : "Black ") << Type << " moves to " << ConvertToChar(x + 1) << (y + 1) << endl;
+    Parent->Placements[y][x] = this;
+    Parent->Placements[Position[0]][Position[1]] = temp;
+    temp->SetPosition(Position[0], Position[1]);
+    SetPosition(y,x);
+    
 }
 
 
 int main() {
     board som;
     som.SetBoard();
-    som.PrintBoard();
-    som.Placements[0][4]->Move(7,4);
-    som.PrintBoard();
-    som.Placements[7][4]->Move(0,4);
-    som.Placements[6][4]->Move(1,4);
-    som.PrintBoard();
+    som.Play();
 
+        
     return 0;
 }
